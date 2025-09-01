@@ -5,10 +5,10 @@ import torch
 
 app = Flask(__name__)
 
-# Load model/tokenizer once on startup
+# Use smaller model for Render free tier
 try:
-    tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
-    model = GPT2LMHeadModel.from_pretrained("gpt2")
+    tokenizer = GPT2Tokenizer.from_pretrained("distilgpt2")
+    model = GPT2LMHeadModel.from_pretrained("distilgpt2")
     model.eval()
 except Exception as e:
     print(f"Error loading model: {e}")
@@ -22,7 +22,7 @@ def calculate_perplexity(text):
         return torch.exp(loss).item()
     except Exception as e:
         print(f"Error calculating perplexity: {e}")
-        return 1000  # fallback high score
+        return 1000
 
 def convert_perplexity_to_score(ppl):
     score = max(0, min(100, (ppl - 10) * 3))
@@ -30,7 +30,7 @@ def convert_perplexity_to_score(ppl):
 
 @app.route('/')
 def index():
-    return jsonify({"status": "AI Detection API is live"})
+    return jsonify({"status": "AI Detection API (distilgpt2) is live"})
 
 @app.route('/detect', methods=['POST'])
 def detect():
